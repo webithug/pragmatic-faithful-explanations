@@ -1,0 +1,8 @@
+# Concept CDF AUC averaged over 50 classes.
+# Source: checkpoints/speaker_listener_cub50_target_only_official/sl_cub50_to_l30_*
+# Columns: tau  n_seeds  dpo_auc_mean  dpo_auc_sem  lit_auc_mean  lit_auc_sem
+0	5	0.5185	0.0093	0.5785	0.0096
+5	5	0.5752	0.0096	0.5785	0.0096
+10	5	0.6302	0.0086	0.5785	0.0096
+15	5	0.6989	0.0073	0.5785	0.0096
+20	5	0.7289	0.0069	0.5785	0.0096

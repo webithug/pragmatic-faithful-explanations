@@ -1,0 +1,35 @@
+defaults:
+  - _self_
+
+# Dataset location: CUB with frozen CLIP-ViT-L/14 embeddings.
+dataset_dir: CUB
+embeddings_file: embeddings_clip.pt
+ckpt_subdir: autoencoder_cub
+
+# Classifier (MLP head trained on frozen CLIP embeddings).
+classifier_type: mlp
+classifier_ckpt: checkpoints/cub_mlp/classifier_mlp.pt
+
+# Training
+epochs: 1000
+lr: 1e-4
+batch_size: 64
+seed: 42
+
+# LR schedule
+lr_schedule: cosine
+warmup_epochs: 20
+lr_min: 1e-6
+step_size: 200
+gamma: 0.5
+
+# Loss trade-off: L = lam * recon + (1 - lam) * cls
+lam: 0.1
+
+# Model
+bias: true
+no_normalize: true   # disable unit-sphere re-normalization after each step
+
+# Logging
+run_name: null
+wandb_project: autoencoder-cub

@@ -1,0 +1,80 @@
+defaults:
+  - model: vit_b_16
+  - _self_
+
+# ViT layer to extract embeddings from (-1 = last, 0 = patch emb, 1..12 = after each block)
+layer: -1
+
+# If true and layer == -1, apply final ViT LayerNorm before saving CLS.
+# True matches what the classifier head saw during training (post-LN).
+normalize: true
+
+# extract_embeddings.py: dataset location inside data/ (relative to repo root).
+# Top4 setup: normal / copd_signs / pneumonia / heart_insufficiency + 78 concepts.
+dataset_dir: padchest_final
+dataset_csv: padchest_autoencoder_final.csv
+concepts_json: padchest_concepts_final.json
+
+# extract_embeddings.py: specific ViT checkpoint to use. If null, falls back to
+# the latest run's latest.txt under checkpoints/padchest/.
+ckpt_path: null
+
+data:
+  _target_: experiments.padchest.dataset.PadChestDatasetConfig
+  label_filename: PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv
+  processed_label_filename: processed_labels.csv
+
+  image_size: 224
+
+  # Top4 diagnoses.
+  diagnoses:
+    - normal
+    - copd_signs
+    - pneumonia
+    - heart_insufficiency
+
+model:
+  config:
+    image_size: ${data.image_size}
+    num_channels: 1
+    num_labels: 4
+
+    # ViT architecture overrides. Base defaults come from configs/model/vit_b_16.yaml
+    # (ViT-B/16 = 12 layers, 768 dim, 12 heads, 3072 FFN, ~85M params).
+    # For smaller models, change the values below (or override on the CLI).
+    # Constraints: `num_attention_heads` must divide `hidden_size`;
+    # `intermediate_size` is conventionally 4 * hidden_size.
+    #
+    num_hidden_layers: 6
+    hidden_size: 256
+    num_attention_heads: 4
+    intermediate_size: 1024
+    #
+    # Tiny (~3M params, 192-dim CLS):
+    #   num_hidden_layers=4  hidden_size=192  num_attention_heads=3  intermediate_size=768
+
+train_cls:
+  device: cuda:0
+
+  train_ratio: 0.8
+
+  batch_size: 64
+  num_workers: 8
+  total_steps: 30000
+  lr: 1e-04
+  wd: 1e-06
+
+  eval_step: 100
+  checkpoint_step: 500
+
+  # Per-class positive-weight for BCE (counters imbalance on rare diagnoses).
+  # pos_weight = min(pos_weight_max, n_negatives / n_positives) per class.
+  use_pos_weight: true
+  pos_weight_max: 500
+
+  monitor_config:
+    _target_: pragmatixs.utils.train.monitor.MonitorConfig
+    project: padchest_cls
+    name: train_cls_${hydra:runtime.choices.model}_${now:%Y-%m-%dT%H:%M:%S}
+    log_step: 10
+    reduction: mean

@@ -1,0 +1,9 @@
+# padchest: literal / unfaithful (gamma=0) / faithful speakers under the MAIN config; balanced accuracy.
+"# best-iter by val/listener_acc_recon (top-1), mean +/- SEM over seeds. Sources: outputs/sl_signmode, outputs/sl_signmode_gf0"
+tau,speaker,n,acc_recon_mean,acc_recon_sem,acc_orig_mean,acc_orig_sem,faith_mean,faith_sem
+0,literal,1,0.8997,0.0000,0.8267,0.0000,0.8978,0.0000
+0,unfaithful (gamma=0),5,0.9103,0.0020,0.8177,0.0037,0.8713,0.0034
+0,faithful (gamma=100),5,0.9131,0.0013,0.8446,0.0030,0.8925,0.0025
+10,literal,1,0.4963,0.0000,0.4873,0.0000,0.8978,0.0000
+10,unfaithful (gamma=0),5,0.7893,0.0187,0.7361,0.0219,0.8431,0.0135
+10,faithful (gamma=100),5,0.7844,0.0079,0.7358,0.0212,0.8521,0.0210

@@ -1,0 +1,11 @@
+"# PadChest same-config ablation, MAIN config: l=15 lc=0.1 lu=0.5 sign beta=2 ae_lam=0.1. Metric: balanced acc."
+"# best-iter by val/listener_acc_recon; mean +/- SEM over seeds. Sources: logs/sl_signmode{,_pcbm,_gf0}."
+tau,speaker,n,listener_acc_recon_mean,listener_acc_recon_sem,listener_acc_orig_mean,listener_acc_orig_sem,faith_agree_mean,faith_agree_sem
+0,literal,1,0.8997,0.0000,0.8267,0.0000,0.8978,0.0000
+0,pcbm,5,0.8954,0.0008,0.8810,0.0006,0.9054,0.0001
+0,pragmatic_unfaithful_gamma0,5,0.9103,0.0020,0.8177,0.0037,0.8713,0.0034
+0,pragmatic_faithful_gamma100,5,0.9131,0.0013,0.8446,0.0030,0.8925,0.0025
+10,literal,1,0.4963,0.0000,0.4873,0.0000,0.8978,0.0000
+10,pcbm,5,0.6302,0.0170,0.6225,0.0208,0.9053,0.0000
+10,pragmatic_unfaithful_gamma0,5,0.7893,0.0187,0.7361,0.0219,0.8431,0.0135
+10,pragmatic_faithful_gamma100,5,0.7844,0.0079,0.7358,0.0212,0.8521,0.0210

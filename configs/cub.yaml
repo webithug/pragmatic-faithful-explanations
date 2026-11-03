@@ -1,0 +1,54 @@
+defaults:
+  - model: vit_b_16
+  - _self_
+
+# extract_embeddings.py: dataset location + filenames inside data/.
+dataset_dir: CUB
+dataset_csv: cub_full.csv
+concepts_json: cub_concepts.json
+
+# Specific ViT checkpoint to use for embedding extraction. If null, falls back
+# to the latest run's latest.txt under checkpoints/cub/.
+ckpt_path: null
+
+# If true and layer == -1, apply final ViT LayerNorm before saving CLS.
+layer: -1
+normalize: true
+
+data:
+  _target_: experiments.cub.dataset.CUBDatasetConfig
+  csv_filename: cub_full.csv
+  image_size: 224
+
+model:
+  config:
+    image_size: ${data.image_size}
+    num_channels: 3   # CUB is RGB
+    num_labels: 200   # 200 bird species
+
+    # ViT architecture overrides — same small ViT used for PadChest.
+    # 200-way fine-grained classification with ~10M params from scratch will
+    # be hard; consider pretrained init if accuracy is too low.
+    num_hidden_layers: 12
+    hidden_size: 768
+    num_attention_heads: 4
+    intermediate_size: 1024
+
+train_cls:
+  device: cuda:0
+
+  batch_size: 64
+  num_workers: 8
+  total_steps: 30000
+  lr: 1e-04
+  wd: 1e-06
+
+  eval_step: 200
+  checkpoint_step: 2000
+
+  monitor_config:
+    _target_: pragmatixs.utils.train.monitor.MonitorConfig
+    project: cub_cls
+    name: train_cls_${hydra:runtime.choices.model}_${now:%Y-%m-%dT%H:%M:%S}
+    log_step: 10
+    reduction: mean

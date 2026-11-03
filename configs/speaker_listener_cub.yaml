@@ -1,0 +1,60 @@
+defaults:
+  - _self_
+
+# Required checkpoints/data
+autoencoder_ckpt: checkpoints/autoencoder_cub/ae_ae_cub_lam0.1.pt
+dataset_dir: CUB
+embeddings_file: embeddings_clip_50.pt
+
+# Frozen MLP classifier head used for faithfulness (and y_hat).
+classifier_ckpt: checkpoints/cub_mlp/classifier_mlp_50.pt
+
+# Speaker input: "concepts" (F-dim c) or "embedding" (d-dim h, d=768 for CLIP-L/14)
+speaker_input: embedding
+
+# Literal baseline: deterministic top-l by |c|, no DPO training. Ignores speaker_input.
+literal: false
+
+# Algorithm
+T: 60                # outer iterations
+l: 30                # utterance length (concepts per utterance)
+b: 6                 # candidate utterances for DPO pair
+n_expl: 4            # utterances per image in listener step
+beta: 2              # DPO regularization
+gamma_faith: 10      # faithfulness weight in DPO loss
+lambda_c: 0.1        # consistency weight in reward
+lambda_u: 0.9        # utility weight in reward
+random_warmup: 0.9   # initial random utterance fraction (decays to 0 over T iters)
+
+# Listener preference (analogous to PadChest's radiologist prior), built by
+# experiments/cub/build_cub_prior.py (+ build_subset.py for the 50-class subset).
+prior_path: data/CUB/cub_class_attribute_prior_50.pt
+tau: 0               # preference strength (0 = disabled)
+attenuation_mode: target_only   # sign | pos_mask | target_only (paper)
+sign_mode: true      # legacy alias; ignored when attenuation_mode is set
+logit_clamp: 5.0     # absolute bound on per-class listener logits
+ckpt_subdir: speaker_listener_cub50_target_only_official
+
+# Training
+lr_speaker: 1e-5
+lr_listener: 1e-4
+batch_size: 64
+listener_epochs: 10
+seed: 42
+
+# Logging
+run_name: null
+wandb_project: speaker-listener-cub
+
+# Save speaker + listener weights every outer iter.
+save_checkpoint: true
+
+# Warm-start the Speaker by behavior-cloning LiteralSpeaker's selection
+# distribution softmax(|c|) before DPO begins.
+init_from_literal: true
+init_epochs: 100
+init_lr: 1e-4
+
+# Pre-train the Listener on literal-style utterances after speaker warmup.
+init_listener_with_literal: true
+init_listener_epochs: 1000

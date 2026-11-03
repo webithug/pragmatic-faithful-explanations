@@ -1,0 +1,53 @@
+defaults:
+  - _self_
+
+# Dataset location. Top4 setup.
+dataset_dir: padchest_final
+ckpt_subdir: autoencoder_vit
+
+# Classifier backend for faithfulness eval + y_hat computation:
+#   "mlp" → frozen ConceptCLIP embeddings + MLP head (checkpoints/padchest_mlp/classifier_mlp.pt)
+#   "vit" → from-scratch ViT embeddings + ViT classifier head (latest train_cls_vit_b_16_*)
+# Each mode pairs with a matching embeddings_file below.
+classifier_type: vit
+
+# Main configuration (paper): from-scratch ViT embeddings + ViT head.
+embeddings_file: embeddings_vit_ln.pt
+classifier_ckpt: checkpoints/padchest/classifier_vit_b16.pt
+
+# To switch to vit mode, override:
+#   classifier_type=vit embeddings_file=embeddings_vit_ln.pt
+# (the vit head is found automatically under checkpoints/padchest/ via latest.txt)
+
+# 4 diagnoses to stratify the train/val split on.
+sl_diagnoses:
+  - normal
+  - copd_signs
+  - pneumonia
+  - heart_insufficiency
+
+# Training
+epochs: 300
+lr: 1e-4
+batch_size: 64
+train_ratio: 0.8
+seed: 42
+
+# LR schedule: null (constant), "cosine" (warmup + cosine decay), or "step".
+lr_schedule: cosine
+warmup_epochs: 20
+lr_min: 1e-6
+# For "step" only:
+step_size: 200
+gamma: 0.5
+
+# Loss trade-off: L = lam * recon + (1 - lam) * cls
+lam: 0.1
+
+# Model
+bias: true
+no_normalize: true  # disable unit-sphere re-normalization after each step
+
+# Logging
+run_name: null
+wandb_project: autoencoder-padchest-gr

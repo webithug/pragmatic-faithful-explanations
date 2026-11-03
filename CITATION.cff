@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Tell Me What I Need to Know: Faithful and Pragmatic Explanations"
+authors:
+  - family-names: Wang
+    given-names: Wei-Po
+  - family-names: Teneggi
+    given-names: Jacopo
+  - family-names: Yi
+    given-names: Paul
+  - family-names: Shu
+    given-names: Tianmin
+  - family-names: Sulam
+    given-names: Jeremias
+preferred-citation:
+  type: article
+  title: "Tell Me What I Need to Know: Faithful and Pragmatic Explanations"
+  authors:
+    - family-names: Wang
+      given-names: Wei-Po
+    - family-names: Teneggi
+      given-names: Jacopo
+    - family-names: Yi
+      given-names: Paul
+    - family-names: Shu
+      given-names: Tianmin
+    - family-names: Sulam
+      given-names: Jeremias
+  journal: "Transactions on Machine Learning Research"
+  year: 2026
+  url: "https://openreview.net/forum?id=GK9Gq9VVcU"

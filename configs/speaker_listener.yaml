@@ -1,0 +1,85 @@
+defaults:
+  - _self_
+
+# Required checkpoints/data
+autoencoder_ckpt: checkpoints/autoencoder_vit/ae_ae_vit_lam0.1.pt
+dataset_dir: padchest_final            # directory under data/ (where embeddings_file and sl_dataset live)
+embeddings_file: embeddings_vit_ln.pt
+sl_dataset: padchest_clean_final.csv   # filters by ImageID
+gr_csv: processed_labels_gr.csv        # for radiologist prior
+
+# Frozen classifier (ViT head) for faithfulness. If null, falls back to the
+# latest run under checkpoints/padchest/ via latest.txt.
+classifier_ckpt: checkpoints/padchest/classifier_vit_b16.pt
+
+# Speaker input: "concepts" (F-dim c) or "embedding" (768-dim h)
+speaker_input: embedding
+
+# Literal baseline: deterministic top-l by |c|, no DPO training. Ignores speaker_input.
+literal: false
+
+# Algorithm
+T: 60                # outer iterations
+l: 15                 # utterance length (concepts per utterance)
+b: 6                 # candidate utterances for DPO pair
+n_expl: 4            # utterances per image in listener step
+beta: 2            # DPO regularization
+
+gamma_faith: 100     # faithfulness weight in DPO loss
+lambda_c: 0.1        # consistency weight in reward
+lambda_u: 0.5        # utility weight in reward
+tau: 0             # listener coverage preference (0 = disabled)
+random_warmup: 0.5   # initial random utterance fraction (decays linearly to 0 over T iters)
+
+# Training
+lr_speaker: 1e-5
+lr_listener: 1e-4
+batch_size: 64
+listener_epochs: 1
+train_ratio: 0.8     # train/val split for listener training
+seed: 42
+
+# Logging
+run_name: null
+wandb_project: speaker-listener-padchest-gr
+
+# Save speaker + listener weights every outer iter. Defaults off — the sweep
+# generates T checkpoints per run, which adds up fast. Enable for a single run
+# if you want to inspect trained speaker outputs later.
+save_checkpoint: true
+
+# Subdirectory under checkpoints/ where SL checkpoints are written. Override
+# per-experiment to keep multiple sweeps on disk simultaneously.
+ckpt_subdir: speaker_listener
+
+# Listener logit clamp (absolute). Smaller -> listener is less confident
+# pre-attenuation, so the sign-mode BCE penalty flips predictions at lower tau
+# (the crossover where DPO beats literal on pi-alignment moves earlier). 5.0
+# matches the original setting; try 2.0-3.0 to push the crossover left.
+logit_clamp: 5.0
+
+# Listener attenuation mode (tri-state):
+#   sign     -> sign(logit)-based attenuation: penalty forces the listener
+#               AGAINST its current prediction (can flip), bounded by logit_clamp.
+#   pos_mask -> pos_mask scaling: penalty fires on positive (image, class)
+#               entries of pos_mask = y_tilde; negatives pass unattenuated.
+#   legacy   -> symmetric BCE attenuation on all classes (the April-28 setup,
+#               before pos_mask gating was added). Used to reproduce the old
+#               gamma-faith sweep.
+# `sign_mode` is retained for backwards compat: if attenuation_mode is unset,
+# sign_mode=true -> "sign", sign_mode=false -> "pos_mask".
+attenuation_mode: sign
+sign_mode: true
+
+# Warm-start the Speaker by behavior-cloning LiteralSpeaker's selection
+# distribution softmax(|c|) before DPO begins. Makes DPO a "BC + RL refinement"
+# loop — DPO starts at literal's policy. Ignored when literal=true.
+init_from_literal: true
+init_epochs: 100
+init_lr: 1e-4
+
+# Pre-train the Listener on literal-style utterances after speaker warmup,
+# before DPO begins. Gives listener a meaningful starting state so iter-1
+# utility reward isn't dominated by an untrained listener.
+init_listener_with_literal: true
+init_listener_epochs: 100

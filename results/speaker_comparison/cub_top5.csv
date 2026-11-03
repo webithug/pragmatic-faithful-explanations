@@ -1,0 +1,9 @@
+# cub: literal / unfaithful (gamma=0) / faithful speakers under the MAIN config; top-5 agreement.
+"# best-iter by val/listener_acc_recon (top-1), mean +/- SEM over seeds. Sources: outputs/sl_cub50_target_only_official, outputs/sl_cub50_target_only_official_gf0"
+tau,speaker,n,acc_recon_mean,acc_recon_sem,acc_orig_mean,acc_orig_sem,faith_mean,faith_sem
+0,literal,5,0.9958,0.0016,0.8733,0.0023,0.9271,0.0000
+0,unfaithful (gamma=0),5,0.9889,0.0027,0.8635,0.0047,0.9253,0.0028
+0,faithful (gamma=10),5,0.9892,0.0014,0.8656,0.0081,0.9226,0.0040
+20,literal,5,0.0055,0.0006,0.3903,0.0034,0.9271,0.0000
+20,unfaithful (gamma=0),5,0.1097,0.0191,0.4371,0.0124,0.7979,0.0210
+20,faithful (gamma=10),5,0.2094,0.0128,0.5267,0.0123,0.8809,0.0059

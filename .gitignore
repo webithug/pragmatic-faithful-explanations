@@ -1,0 +1,17 @@
+# secrets / local config
+.env
+# large artifacts (released separately, see README)
+data
+checkpoints
+outputs
+logs
+wandb/
+# python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+# generated figures
+results/**/*.pdf
+results/**/*.png
