@@ -58,8 +58,16 @@ All paths are relative to the repository root: `data/`, `checkpoints/`,
 
 ### 2. Retrain the speakers from the released embeddings and checkpoints (GPU)
 
-Download `pragmatic-faithful-explanations-artifacts.tar.gz` from the GitHub
-release and extract it in the repository root. It creates
+Download the artifact bundle from the v1.0 GitHub release and extract it in
+the repository root:
+
+```bash
+curl -L -o artifacts.tar.gz \
+  https://github.com/webithug/pragmatic-faithful-explanations/releases/download/v1.0/pragmatic-faithful-explanations-artifacts.tar.gz
+tar xzf artifacts.tar.gz && rm artifacts.tar.gz
+```
+
+It creates
 
 ```
 data/padchest_final/   embeddings_vit_ln.pt (ViT embeddings), padchest_clean_final.csv, split.pt
